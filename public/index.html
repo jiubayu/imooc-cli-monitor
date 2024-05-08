@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta imooc-app-id="imooc-sfthjwerwn23424242" />
+    <title>imooc-cli监控测试</title>
+    <style>
+      * {
+        padding: 0;
+        margin: 0;
+      }
+      .demo1 {
+        width: 100%;
+        height: 1800px;
+        background: darkblue;
+      }
+      .demo2 {
+        width: 100%;
+        height: 300px;
+        background: darkcyan;
+      }
+    </style>
+  </head>
+  <body imooc-page-id="imooc-0123425645">
+    <a href="https://baidu.com" onclick="handleClick()">跳转</a>
+    <div class="dom" onclick="jump()">event跳转</div>
+    <!-- 曝光埋点：由不可见变为可见（最初未渲染） -->
+    <div class="demo1"></div>
+    <button onclick="addDom()">addDOM</button>
+    <!-- 曝光埋点：由不可见变为可见（最初未显示） -->
+    <div class="demo2" appear></div>
+    
+    <!-- <script src="https://imooc-pro-bucket.oss-cn-beijing.aliyuncs.com/imooc-cli-monitor.js?Expires=1715006961&OSSAccessKeyId=TMP.3KexbxwGpVByGTsNLzXDDwzguKCcm3FvbPYgBxSR81rRJJH84nBmJK4EpsieATPRdtRVQaz7DmBbSsM63h9aTnHGG41huP&Signature=9iAxr4etbY79JL0rHKXjwLzthE4%3D"></script> -->
+    <!-- <script>
+      (function(){
+        const script = document.createElement('script');
+        const url ='../dist/imooc-cli-monitor.js';
+        script.setAttribute('src', url);
+        const body = document.body;
+        body.insertBefore(script, body.firstChild);
+        script.onload = () => {
+          const event = new CustomEvent('onMonitorScriptLoad');
+          window.dispatchEvent(event);
+        }
+      })()
+    </script> -->
+    <script>
+      function addDom() {
+        let div = document.createElement('div');
+        div.innerText = 'new dom';
+        div.style.background = 'red';
+        div.classList='new-dom';
+        div.setAttribute('appear', '');
+        document.body.insertBefore(div, document.body.firstChild);
+        window.ImoocCliMonitor.collectAppear();
+      }
+      function handleClick(){
+        window.ImoocCliMonitor.sendClick({
+          jumpUrl: 'https://baidu.com'
+        });
+      }
+      function jump() {
+        window.location.href = 'https://www.qq.com'
+         window.ImoocCliMonitor.sendClick({
+          jumpUrl: 'https://www.qq.com',
+          target: document.querySelector('.dom').tagName
+        });
+      }
+    </script>
+    <script>
+      document
+        .querySelector('.demo2')
+        .addEventListener('appearEvent', function (e) {
+          ImoocCliMonitor.sendExp({a:1, b:2})
+        });
+      window.onload = function () {
+        const m = ImoocCliMonitor;
+        m.registerBeforeUploadParams((data) => {
+          data['custom'] = 1;
+          console.log(data, 'data----');
+        });
+        m.registerAfterUploadParams((data, url) => {
+          console.log(data, url, 'url---')
+        })
+        m.sendPV();
+      };
+    </script>
+  </body>
+</html>

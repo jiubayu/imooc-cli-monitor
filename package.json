@@ -1,0 +1,21 @@
+{
+  "name": "imooc-cli-monitor",
+  "version": "1.0.0",
+  "description": "",
+  "main": "imooc-cli-monitor.js",
+  "scripts": {
+    "dev": "webpack serve --config webpack.dev.config.js",
+    "build": "webpack --config webpack.build.config.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "clean-webpack-plugin": "^4.0.0",
+    "html-webpack-plugin": "^5.6.0",
+    "qs": "^6.12.1",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.4"
+  }
+}
