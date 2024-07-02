@@ -23,14 +23,21 @@
     </style>
   </head>
   <body imooc-page-id="imooc-0123425645">
-    <a href="https://baidu.com" onclick="handleClick()">跳转</a>
-    <div class="dom" onclick="jump()">event跳转</div>
+    <a
+      href="https://baidu.com"
+      class="link"
+      onclick="handleClick(event)"
+      imooc-mod-id="jump-to-baidu"
+      >跳转</a
+    >
+    <div class="dom" onclick="jump(e)">event跳转</div>
+    <button class="click-send">click上报</button>
     <!-- 曝光埋点：由不可见变为可见（最初未渲染） -->
     <div class="demo1"></div>
     <button onclick="addDom()">addDOM</button>
     <!-- 曝光埋点：由不可见变为可见（最初未显示） -->
-    <div class="demo2" appear></div>
-    
+    <div class="demo2" appear imooc-mod-id="m123456"></div>
+
     <!-- <script src="https://imooc-pro-bucket.oss-cn-beijing.aliyuncs.com/imooc-cli-monitor.js?Expires=1715006961&OSSAccessKeyId=TMP.3KexbxwGpVByGTsNLzXDDwzguKCcm3FvbPYgBxSR81rRJJH84nBmJK4EpsieATPRdtRVQaz7DmBbSsM63h9aTnHGG41huP&Signature=9iAxr4etbY79JL0rHKXjwLzthE4%3D"></script> -->
     <!-- <script>
       (function(){
@@ -50,21 +57,26 @@
         let div = document.createElement('div');
         div.innerText = 'new dom';
         div.style.background = 'red';
-        div.classList='new-dom';
+        div.classList = 'new-dom';
         div.setAttribute('appear', '');
         document.body.insertBefore(div, document.body.firstChild);
         window.ImoocCliMonitor.collectAppear();
       }
-      function handleClick(){
-        window.ImoocCliMonitor.sendClick({
-          jumpUrl: 'https://baidu.com'
-        });
+      function handleClick(e) {
+        window.ImoocCliMonitor.sendClick(
+          {
+            jumpUrl: 'https://baidu.com',
+            target: e.target.tagName,
+          },
+          e,
+          true
+        );
       }
-      function jump() {
-        window.location.href = 'https://www.qq.com'
-         window.ImoocCliMonitor.sendClick({
+      function jump(e) {
+        window.location.href = 'https://www.qq.com';
+        window.ImoocCliMonitor.sendClick({
           jumpUrl: 'https://www.qq.com',
-          target: document.querySelector('.dom').tagName
+          target: document.querySelector('.dom').tagName,
         });
       }
     </script>
@@ -72,19 +84,56 @@
       document
         .querySelector('.demo2')
         .addEventListener('appearEvent', function (e) {
-          ImoocCliMonitor.sendExp({a:1, b:2})
+          const mod_id = e.target.getAttribute('imooc-mod-id');
+          ImoocCliMonitor.sendExp({}, {mod_id});
         });
-      window.onload = function () {
+      window.addEventListener('load', function () {
         const m = ImoocCliMonitor;
         m.registerBeforeUploadParams((data) => {
-          data['custom'] = 1;
-          console.log(data, 'data----');
+          // data['custom'] = 1;
+          // console.log(data, 'data----');
         });
         m.registerAfterUploadParams((data, url) => {
-          console.log(data, url, 'url---')
-        })
+          // console.log(data, url, 'url---');
+        });
         m.sendPV();
-      };
+      });
+      // 性能采集
+      window.addEventListener('load', function (e) {
+        /**
+         * 性能指标获取
+         */
+
+        // PerformanceTiming 毫秒级
+        // 问题1: 精度不足，只能达到毫秒
+        // 问题2: 时机不好把握，如无法知道load事件无法结束，window.addEventListener('load'）无法拿到timing.loadEventEnd的数值
+        // const timing = window.performance.timing;
+        // const dns = timing.domainLookupEnd - timing.domainLookupStart;
+        // const tcp = timing.connectEnd - timing.connectStart;
+        // const http = timing.responseStart - timing.requestStart;
+        // const dom = timing.domComplete - timing.domLoading;
+        // const load = timing.loadEventEnd - timing.loadEventStart;
+        // console.log(dns, 'dns------');
+        // console.log(tcp, 'tcp------');
+        // console.log(http, 'http------');
+        // console.log(dom, 'dom------');
+        // console.log(load, 'load------');
+        // PerformanceNavigationTiming 纳秒级
+        // const perfEntries = window.performance.getEntriesByType('navigation');
+        // const timing = perfEntries[0];
+        // console.log("🚀 ~ timing:", timing)
+        // const dns = timing.domainLookupEnd - timing.domainLookupStart;
+        // const tcp = timing.connectEnd - timing.connectStart;
+        // const http = timing.responseStart - timing.requestStart;
+        // const dom = timing.domComplete - timing.domInteractive;
+        // const load = timing.loadEventEnd - timing.loadEventStart;
+        // console.log(dns, 'dns------');
+        // console.log(tcp, 'tcp------');
+        // console.log(http, 'http------');
+        // console.log(dom, 'dom------');
+        // console.log(load, 'load------');
+        window.performance.mark('onload');
+      });
     </script>
   </body>
 </html>

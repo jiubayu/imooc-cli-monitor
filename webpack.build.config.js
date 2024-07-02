@@ -18,6 +18,8 @@ module.exports = {
       filename: 'index.html',
       template: './public/index.html',
       chunks: ['imooc-cli-monitor'],
+      scriptLoading: 'blocking',
+      inject: 'head',
     }),
   ],
 };

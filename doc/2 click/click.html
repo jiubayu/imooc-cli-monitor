@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Click Event</title>
+  </head>
+  <body>
+    <button onclick="handleClick1()">按钮1</button>
+    <button onclick="handleClick2()">按钮 2</button>
+    <script>
+      function handleClick1() {
+        console.log('click1');
+      }
+      function handleClick2() {
+        console.log('click2');
+      }
+      // document.addEventListener('click', (e) => {
+      //   console.log('document click', e.target);
+      // })
+
+      window.addEventListener('load', (e) => {
+        console.log('document-load', new Date().getTime())
+      })
+      window.addEventListener('beforeunload', (event) => {
+        console.log('docuement-beforeunload', new Date().getTime());
+        event.preventDefault();
+        // Chrome requires returnValue to be set.
+        event.returnValue = "保存数据后离开";
+      })
+    </script>
+  </body>
+</html>

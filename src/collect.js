@@ -21,7 +21,7 @@ export function registerAfterUploadParams(fn) {
 }
 
 // 采集报错信息
-function collect(customData, eventType) {
+function collect(customData, eventType, isSendBeacon=false) {
   // 1 采集页面基本信息
   //   a 应用id（meta中的imooc-app-id）
   //   b pageid（body中imooc-page-id）
@@ -54,11 +54,11 @@ function collect(customData, eventType) {
     beforeUpload(params);
   }
   const data = qs.stringify(params);
-  console.log(data, 'data---');
+  console.log(data, 'data---------');
   // 3 调用日志上报API
   let resUrl, uploadData;
   try {
-    const res = upload(data, {eventType});
+    const res = upload(data, {eventType}, isSendBeacon);
     resUrl = res.url;
     uploadData = res.data;
   } catch (e) {
@@ -75,15 +75,26 @@ export const sendPV = () => {
 };
 // 上报曝光埋点
 export function sendExp(data, options = {}) {
-  collect(data, 'EXP');
+  collect({...data, ...options}, 'EXP');
 }
 // 上报点击埋点
-export function sendClick(data={}) {
-  collect(data, 'CLICK')
+export function sendClick(data = {}, e, isSendBeacon = false) {
+  const mod_id = e.target.getAttribute('imooc-mod-id');
+  console.log(mod_id, 'mod_id-----');
+  collect({...data, mod_id}, 'CLICK', isSendBeacon);
+}
+// 上报停留时长
+export function sendStayTime(data={}, ) {
+  collect(data, 'STAY', true)
 }
 // 上传自定义埋点
 export function sendCustom(data = {}) {
   collect(data, 'CUSTOM');
+}
+
+// 上报性能指标
+export function sendPerf(data = {}) {
+  collect(data, 'PERF', true);
 }
 
 export function collectAppear() {
@@ -96,7 +107,7 @@ export function collectAppear() {
     ob = new IntersectionObserver(function (entrys) {
       entrys.forEach((entry) => {
         if (entry.intersectionRatio > 0) {
-          console.log(entry.target.className, 'appear');
+          // console.log(entry.target.className, 'appear');
           entry.target.dispatchEvent(appearEvent);
         } else {
           entry.target.dispatchEvent(disAppearEvent);
